@@ -1,0 +1,172 @@
+@import url('https://fonts.cdnfonts.com/css/pusab');
+@import url('https://fonts.cdnfonts.com/css/picky-sway');
+@import url('https://fonts.cdnfonts.com/css/varuna');
+@import url('https://fonts.cdnfonts.com/css/ubuntu');
+
+.flex-container {
+  display: flex;
+  justify-content: space-between; /* pushes cards apart */
+  align-items: center;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  align-items: center; /* vertical align image + text */
+  gap: 10px;
+  text-decoration: none;
+}
+
+.left-icon {
+  flex-direction: row; /* image left, text right */
+}
+
+.right-icon {
+  flex-direction: row; /* order already reversed in HTML */
+}
+
+
+
+
+
+
+body {
+  background: radial-gradient(#7c0000,#313131);
+  font-family: 'Picky Sway', sans-serif;
+  color: white;
+}
+p {
+  text-align: left;
+  font-family: 'picky sway', sans-serif;
+  font-size: 1em;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+  
+}
+h1 {
+  font-weight: bold;
+  text-align: center;
+  font-family: 'pusab', sans-serif;
+  font-size: 3.5em;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+}
+
+h2 {
+  font-weight: bold;
+  text-align: left;
+  font-family: 'picky sway', sans-serif;
+  font-size: 2.15em;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+}
+
+h3 {
+  font-weight: bold;
+  text-align: left;
+  font-family: 'picky sway', sans-serif;
+  font-size: 30px;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+}
+
+h4 {
+  font-weight: bold;
+  text-align: left;
+  font-family: 'picky sway', sans-serif;
+  font-size: 22px;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+}
+
+.header {
+  width: 50%;
+  margin-left: 25%;
+  border: solid 4px darkorange;
+  border-radius: 10px;
+  box-shadow: 4px 4px 10px 4px rgba(0, 0, 0, 0.8);
+}
+
+.align-right {
+  margin-right: 20px;
+  float: right;
+  margin-bottom: 10px;
+  border: solid 4px darkred;
+  border-radius: 10px;
+}
+
+.align-center {
+  float: center;
+}
+
+hr {
+  clear: both;
+}
+
+.container {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;     /* Centers vertically */
+  height: 200px;           /* Set a height for vertical centering to work */
+}
+
+.itemtitle {
+  font-family: 'ubuntu', sans-serif;
+  font-weight: bold;
+  font-size: 1.25em;
+}
+
+.itemtitle2 {
+  font-family: 'ubuntu', sans-serif;
+  font-weight: bold;
+  font-size: 1.25em;
+  text-align: right;
+  margin: ;
+}
+
+.leftAlign {
+  float: left; 
+  box-shadow: 4px 4px 10px 4px rgba(0, 0, 0, 0.6);
+}
+
+.outlined-text {
+  /* Define the stroke width and color */
+  -webkit-text-stroke: 0.75px black; 
+  /* Standard property for non-webkit browsers if it becomes standard */
+  text-stroke: 0.75px black; 
+}
+
+.outlined-hypertext{
+  -webkit-text-stroke: 0.75px black; 
+  text-stroke: 0.75px black; 
+  color: blue;
+  font-family: 'ubuntu', sans-serif;
+}
+
+.rightAlign {
+  float: right; 
+  box-shadow: 4px 4px 10px 4px rgba(0, 0, 0, 0.6);
+}
+
+.normalise {
+  color:white;
+  font-weight: bold;
+  text-align: left;
+  font-family: 'picky sway', sans-serif;
+  font-size: 30px;
+  color: white;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6);
+  text-decoration: none;
+}
+
+.hypertext {
+  color: blue;
+  font-family: 'ubuntu', sans-serif;
+}
+
+.disclaimer {
+  font-family: 'varuna', sans-serif;
+  font-size: 12.5px;
+  color: #000000;
+  text-align: center;
+}

@@ -1,0 +1,52 @@
+# ⚡ ULTRA-QUICK REFERENCE
+
+## 30-Second Deployment
+
+### GitHub Pages
+```
+1. github.com → Sign up/Login
+2. New repository → Name: gddl-website → Public → Create
+3. Upload files → Drag all files → Commit
+4. Settings → Pages → Source: main → Save
+5. Wait 2 min → Your link: https://USERNAME.github.io/gddl-website/
+```
+
+### Netlify
+```
+1. netlify.com → Sign up
+2. Drag entire gddl-website folder to dashboard
+3. Link appears: https://your-site.netlify.app
+```
+
+### Vercel
+```
+1. vercel.com → Sign up
+2. Add New → Project → Browse → Select gddl-website folder
+3. Deploy → Link appears: https://your-project.vercel.app
+```
+
+## Files to Upload
+✅ Upload EVERYTHING in the gddl-website folder
+
+## What Changed
+✅ YouTube links → iframes (videos play on your site)
+✅ All styling preserved
+✅ Ready to deploy as-is
+
+## Cost
+✅ $0 (completely free forever)
+✅ No credit card needed
+✅ Links never expire
+
+## Your Site Features
+✅ Embedded YouTube videos
+✅ Responsive design
+✅ Works on all devices
+✅ Fast loading (CDN)
+✅ Secure (HTTPS)
+✅ No ads
+
+---
+
+**That's it! Choose one method above and follow the steps.**
+**Your site will be live in under 5 minutes!**
