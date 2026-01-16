@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The pointercrate API</title>
+    <link rel="stylesheet" href="style2.css">
+  </head>
+  <body>
+    
+    <a href="index.html">
+      <div class="container">
+        <img src="pointercrate.png" width="200" class="align-center">
+      </div>
+    </a>
+
+    <h1>The pointercrate API</h1>
+
+    <p>
+      This is the documentation for the pointercrate application programming interface
+      (short: API). If you dont know what an API is or have no idea how you even got to
+      this page, this link takes you back to the demonlist. If you rather want to read
+      source code of the implementation directly, head over to the github repository
+      instead. It also contains the markdown files these documentation pages are
+      generated from, so if you find any error here feel free to submit a pull request!
+    </p>
+
+    <p>
+      The API can be used to retrieve data about the demonlist and is internally used to
+      manage it. All endpoints described here are located under
+      <code>https://pointercrate.com/api/v1/</code> unless a different api version is
+      explicitly provided, in which case the v1 part of the URL needs to be amended.
+      Currently, there are only a few endpoints using a v2 scheme.
+    </p>
+
+    <p>
+      It is always good practice setting the <code>Accept</code> header in requests to
+      <code>application/json</code> (or at least give <code>application/json</code> a
+      higher preference than <code>text/html</code>), so that in case of errors, you
+      receive a JSON response instead of the HTML error page.
+    </p>
+
+    <p>
+      All HTTP traffic is automatically redirected to HTTPS. All requests to URLs
+      without a trailing slash are automatically redirected to URLs with one.
+    </p>
+
+    <h2>Errors</h2>
+
+    <p>
+      In case of a client or server error, the API returns an error response. Errors that
+      are specific to a given endpoint are always listed in that endpoint’s
+      documentation. Following is an exhaustive list of errors that can occur at any
+      endpoint in the API. Note that the errors with status code
+      <strong>500 INTERNAL SERVER ERROR</strong> should (obviously) not occur and are
+      only listed for completeness sake. An complete list of all errors can be found at
+      the bottom on this page.
+    </p>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Status code</th>
+          <th>Error code</th>
+          <th>Description</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>400</td><td>40002</td><td>A header in the request was malformed and couldn’t be processed</td><td>header: The name of the malformed header</td></tr>
+        <tr><td>405</td><td>40500</td><td>405 METHOD NOT ALLOWED error</td><td>allowed_methods: A list of allowed HTTP methods</td></tr>
+        <tr><td>409</td><td>40900</td><td>409 CONFLICT error</td><td>-</td></tr>
+        <tr><td>412</td><td>41200</td><td>If-Match header doesn’t match current state</td><td>-</td></tr>
+        <tr><td>418</td><td>41800</td><td>No If-Match header was provided</td><td>-</td></tr>
+        <tr><td>500</td><td>50000</td><td>Unexpected server error</td><td>-</td></tr>
+        <tr><td>503</td><td>50300</td><td>Endpoint down for maintenance</td><td>-</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      In the case that you do not receive any response at all, or receive an
+      Apache/Nginx error page you can assume that the pointercrate server crashed and
+      couldn’t recover. If this is the case all hope is lost.
+    </p>
+
+    <h2>409 versus 412</h2>
+
+    <p>
+      The cases in which a <code>409 CONFLICT</code> error or a
+      <code>412 PRECONDITION FAILED</code> error is returned are very similar. In fact,
+      handling for both errors should probably be identical.
+    </p>
+
+    <p>
+      Both cases need to be handled the same way: re-GET the object to retrieve its
+      updated ETag and retry the request.
+    </p>
+
+    <h2>Authentication</h2>
+
+    <h3>Basic</h3>
+    <p>
+      Some endpoints in the API require HTTP Basic Authentication. Since all
+      communication is enforced via HTTPS, this is OK.
+    </p>
+
+    <h3>Access tokens</h3>
+    <p>
+      Pointercrate requires a valid access token for most endpoints. Tokens are JSON
+      Web Tokens and are retrieved via the login endpoint.
+    </p>
+
+    <p>
+      When required, set the <code>Authorization</code> header to:
+      <code>Bearer &lt;access token&gt;</code>.
+    </p>
+
+    <h3>Cookies</h3>
+    <p>
+      Authentication via cookies is theoretically possible but not usable for API
+      access. Attempts will result in a <code>401 UNAUTHORIZED</code>.
+    </p>
+
+    <h2>Permissions</h2>
+
+    <p>
+      Different endpoints require different permissions. Permissions are stored as a
+      bitmask, and higher permissions imply lower ones transitively.
+    </p>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Bit</th>
+          <th>Description</th>
+          <th>Implies</th>
+          <th>Assigns</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>LIST_HELPER</td><td>0x2</td><td>Reviewing records</td><td>None</td><td>None</td></tr>
+        <tr><td>LIST_MODERATOR</td><td>0x4</td><td>Moderating the demonlist</td><td>LIST_HELPER</td><td>None</td></tr>
+        <tr><td>LIST_ADMINISTRATOR</td><td>0x8</td><td>Administrating the demonlist</td><td>LIST_MODERATOR</td><td>LIST_HELPER, LIST_MODERATOR</td></tr>
+        <tr><td>MODERATOR</td><td>0x2000</td><td>User list access</td><td>None</td><td>None</td></tr>
+        <tr><td>ADMINISTRATOR</td><td>0x4000</td><td>User management</td><td>MODERATOR</td><td>LIST_ADMINISTRATOR</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Pagination and Filtering</h2>
+
+    <p>
+      Some endpoints support pagination due to large result sets. Pagination is handled
+      via query parameters such as <code>limit</code>, <code>after</code>, and
+      <code>before</code>.
+    </p>
+
+    <h3>Pagination Query Parameters</h3>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>limit</td><td>Maximum objects to return (1–100)</td><td>50</td></tr>
+        <tr><td>after</td><td>ID of last object from previous page</td><td>null</td></tr>
+        <tr><td>before</td><td>ID of first object from next page</td><td>null</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Filtering</h3>
+
+    <ul>
+      <li>Equality filtering via <code>?field=value</code></li>
+      <li>Inequality filtering via <code>__lt</code> or <code>__gt</code></li>
+      <li>Infix filtering via <code>_contains</code></li>
+    </ul>
+
+    <p>
+      Example:
+      <code>/api/v1/records/?after=200&amp;limit=10&amp;status=APPROVED&amp;progress__lt=100</code>
+    </p>
+
+    <h2>External Videos</h2>
+
+    <p>
+      Pointercrate accepts videos from specific hosts and normalizes URLs into a single
+      format per host.
+    </p>
+
+    <h3>Accepted Video Hosts</h3>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Normalized URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>YouTube</td><td>https://www.youtube.com/watch?v={id}</td></tr>
+        <tr><td>Twitch</td><td>https://www.twitch.tv/videos/{id}</td></tr>
+        <tr><td>Everyplay</td><td>https://everyplay.com/videos/{id}</td></tr>
+        <tr><td>Vimeo</td><td>https://vimeo.com/{id}</td></tr>
+        <tr><td>Bilibili</td><td>https://www.bilibili.com/video/{id}</td></tr>
+      </tbody>
+    </table>
+
+    <h2>List of Errors</h2>
+
+    <p>
+      The API aims to provide detailed errors wherever possible. Generic errors should
+      be rare. Suggestions for better error communication are welcome via GitHub
+      issues.
+    </p>
+    
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Status code</th>
+          <th>Error code</th>
+          <th>Description</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>400</td><td>40000</td><td>A generic 400 BAD REQUEST error</td><td>-</td></tr>
+        <tr><td>400</td><td>40001</td><td>Provided video or channel URL was malformed</td><td>-</td></tr>
+        <tr><td>400</td><td>40002</td><td>A header in the request was malformed and couldn’t be processed</td><td>header: The name of the malformed header</td></tr>
+
+        <tr><td>401</td><td>40100</td><td>A generic 401 UNAUTHORIZED error</td><td>-</td></tr>
+
+        <tr><td>403</td><td>40300</td><td>A generic 403 FORBIDDEN error</td><td>-</td></tr>
+        <tr><td>403</td><td>40301</td><td>You do not have the permissions required to perform this request</td><td>required: Permission bitmasks</td></tr>
+        <tr><td>403</td><td>40302</td><td>Attempt to delete your own account via administrative endpoints</td><td>-</td></tr>
+        <tr><td>403</td><td>40303</td><td>Attempt to modify your own account via administrative endpoints</td><td>-</td></tr>
+        <tr><td>403</td><td>40304</td><td>You have been banned from submitting records</td><td>-</td></tr>
+        <tr><td>403</td><td>40305</td><td>Attempt to assign non-assignable permissions</td><td>non_assignable: Permission bitmasks</td></tr>
+        <tr><td>403</td><td>40306</td><td>The claim you are trying to modify is unverified</td><td>-</td></tr>
+        <tr><td>403</td><td>40307</td><td>Attempt to geolocate through a VPN was detected</td><td>-</td></tr>
+        <tr><td>403</td><td>40308</td><td>Not authorized to submit a record for this player</td><td>-</td></tr>
+
+        <tr><td>404</td><td>40400</td><td>A generic 404 NOT FOUND error</td><td>-</td></tr>
+        <tr><td>404</td><td>40401</td><td>Referenced object could not be found</td><td>depends on endpoint</td></tr>
+
+        <tr><td>405</td><td>40500</td><td>405 METHOD NOT ALLOWED error</td><td>allowed_methods</td></tr>
+
+        <tr><td>409</td><td>40900</td><td>409 CONFLICT error</td><td>-</td></tr>
+        <tr><td>409</td><td>40902</td><td>Username already in use</td><td>-</td></tr>
+        <tr><td>409</td><td>40905</td><td>Player already registered as a creator</td><td>-</td></tr>
+        <tr><td>409</td><td>40906</td><td>Duplicate video when patching record</td><td>id: Record ID</td></tr>
+        <tr><td>409</td><td>40907</td><td>Subnation set without nation</td><td>-</td></tr>
+        <tr><td>409</td><td>40908</td><td>Conflicting verified user claims during merge</td><td>player1, player2</td></tr>
+
+        <tr><td>411</td><td>41100</td><td>411 LENGTH REQUIRED error</td><td>-</td></tr>
+        <tr><td>412</td><td>41200</td><td>412 PRECONDITION FAILED</td><td>-</td></tr>
+        <tr><td>413</td><td>41300</td><td>413 PAYLOAD TOO LARGE</td><td>-</td></tr>
+        <tr><td>415</td><td>41500</td><td>415 UNSUPPORTED MEDIA TYPE</td><td>expected: application/json</td></tr>
+
+        <tr><td>422</td><td>42200</td><td>A generic 422 UNPROCESSABLE ENTITY error</td><td>-</td></tr>
+        <tr><td>422</td><td>42202</td><td>Username too short or not trimmed</td><td>-</td></tr>
+        <tr><td>422</td><td>42204</td><td>Password too short</td><td>-</td></tr>
+        <tr><td>422</td><td>42207</td><td>Invalid pagination limit</td><td>-</td></tr>
+        <tr><td>422</td><td>42212</td><td>Record requirement out of bounds</td><td>-</td></tr>
+        <tr><td>422</td><td>42213</td><td>Demon added out-of-bounds</td><td>maximal</td></tr>
+        <tr><td>422</td><td>42215</td><td>Invalid record progress</td><td>requirement</td></tr>
+        <tr><td>422</td><td>42217</td><td>Duplicate record submission</td><td>status, existing</td></tr>
+        <tr><td>422</td><td>42218</td><td>Record holder is banned</td><td>-</td></tr>
+        <tr><td>422</td><td>42219</td><td>Legacy demon record submitted</td><td>-</td></tr>
+        <tr><td>422</td><td>42220</td><td>Non-100% record on extended list</td><td>-</td></tr>
+        <tr><td>422</td><td>42222</td><td>Invalid URL protocol</td><td>-</td></tr>
+        <tr><td>422</td><td>42223</td><td>Authentication info in URL</td><td>-</td></tr>
+        <tr><td>422</td><td>42224</td><td>Unsupported video host</td><td>-</td></tr>
+        <tr><td>422</td><td>42225</td><td>Video URL format mismatch</td><td>expected</td></tr>
+        <tr><td>422</td><td>42226</td><td>YouTube URL expected</td><td>-</td></tr>
+        <tr><td>422</td><td>42227</td><td>Pagination after &lt; before</td><td>-</td></tr>
+        <tr><td>422</td><td>42228</td><td>Ambiguous demon name</td><td>demons</td></tr>
+        <tr><td>422</td><td>42229</td><td>Mutually exclusive fields used</td><td>-</td></tr>
+        <tr><td>422</td><td>42230</td><td>Record note is empty</td><td>-</td></tr>
+        <tr><td>422</td><td>42231</td><td>Player already has verified claim</td><td>-</td></tr>
+        <tr><td>422</td><td>42232</td><td>Missing raw footage</td><td>-</td></tr>
+        <tr><td>422</td><td>42233</td><td>Invalid raw footage URL</td><td>-</td></tr>
+        <tr><td>422</td><td>42234</td><td>Password change not supported</td><td>-</td></tr>
+        <tr><td>422</td><td>42235</td><td>Invalid Geometry Dash level ID</td><td>-</td></tr>
+
+        <tr><td>428</td><td>42800</td><td>Missing If-Match header</td><td>-</td></tr>
+        <tr><td>429</td><td>42900</td><td>Rate limited</td><td>remaining</td></tr>
+
+        <tr><td>500</td><td>50000</td><td>Unexpected server state</td><td>-</td></tr>
+        <tr><td>500</td><td>50003</td><td>Database access error</td><td>-</td></tr>
+        <tr><td>500</td><td>50004</td><td>Database timeout</td><td>-</td></tr>
+        <tr><td>500</td><td>50005</td><td>Database connection failure</td><td>-</td></tr>
+
+        <tr><td>503</td><td>50301</td><td>Server in maintenance mode</td><td>-</td></tr>
+      </tbody>
+    </table>
+
+  </body>
+</html>
